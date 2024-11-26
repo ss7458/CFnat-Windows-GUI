@@ -3,18 +3,18 @@ name: Build CFnat-Windows-GUI
 on:
   push:
     branches:
-      - master
+      - main
   pull_request:
     branches:
-      - master
+      - main
 
 jobs:
   build:
-    runs-on: windows-latest  # 使用最新的 Windows 环境
+    runs-on: windows-latest
 
     steps:
       - name: Checkout code
-        uses: actions/checkout@v3  # 检出仓库代码
+        uses: actions/checkout@v3
 
       - name: Set up MSYS2
         uses: msys2/setup-msys2@v2
@@ -23,15 +23,12 @@ jobs:
 
       - name: Install dependencies
         run: |
-          pacman -S --noconfirm base-devel mingw-w64-x86_64-toolchain
-
-      - name: Install additional libraries (if needed)
-        run: |
-          pacman -S --noconfirm mingw-w64-x86_64-qt5  # 假设项目使用了 Qt
+          # 确保 pacman 可用并安装依赖
+          pacman -S --noconfirm base-devel mingw-w64-x86_64-toolchain mingw-w64-x86_64-qt5
 
       - name: Build project
         run: |
-          # 假设你使用的是 CMake 和 Qt 进行构建
+          # 假设项目使用 CMake 构建
           cmake -G "MSYS Makefiles" .
           make
 
@@ -39,4 +36,4 @@ jobs:
         uses: actions/upload-artifact@v3
         with:
           name: cfnat-windows-gui-artifacts
-          path: ./path/to/built/output  # 指定构建输出目录
+          path: ./path/to/built/output  # 修改为实际的构建输出路径
