@@ -25,16 +25,16 @@ jobs:
 
     - name: Add MSBuild to PATH
       run: |
-        # 将 MSBuild 添加到 PATH 环境变量中
-        echo "##[add-path]C:\\Program Files\\dotnet" >> $GITHUB_ENV  # 确保 .NET SDK 的路径在 PATH 中
-        echo "##[add-path]C:\\Program Files (x86)\\Microsoft Visual Studio\\2019\\BuildTools\\MSBuild\\Current\\Bin" >> $GITHUB_ENV  # 将 MSBuild 路径添加到 PATH 中
+        # 显式将 Visual Studio MSBuild 路径添加到环境变量中
+        echo "##[add-path]C:\\Program Files (x86)\\Microsoft Visual Studio\\2019\\BuildTools\\MSBuild\\Current\\Bin" >> $GITHUB_ENV  # 添加 Visual Studio 2019 BuildTools MSBuild 路径
         echo "##[add-path]C:\\Program Files\\Microsoft Visual Studio\\2022\\Enterprise\\MSBuild\\Current\\Bin" >> $GITHUB_ENV  # 添加 Visual Studio 2022 MSBuild 路径
-
-    - name: Check MSBuild version
-      run: msbuild -version
- 
     - name: Check PATH
       run: echo $env:PATH
+
+    - name: Check MSBuild path
+      run: |
+        # 输出 MSBuild 的路径，确保 msbuild 命令可用
+        where msbuild
 
     - name: Restore NuGet packages
       run: |
@@ -42,7 +42,8 @@ jobs:
 
     - name: Build the project
       run: |
-        msbuild cfnat.win.gui.csproj /p:Configuration=Release /p:Platform=x64  # 使用 MSBuild 编译项目
+        # 使用 msbuild 的完整路径来编译项目
+        "C:\\Program Files (x86)\\Microsoft Visual Studio\\2019\\BuildTools\\MSBuild\\Current\\Bin\\msbuild.exe" cfnat.win.gui.csproj /p:Configuration=Release /p:Platform=x64  # 使用完整路径执行 msbuild
 
     - name: Upload build artifacts
       uses: actions/upload-artifact@v3
