@@ -3,10 +3,10 @@ name: Build and Publish CFnat-Windows-GUI
 on:
   push:
     branches:
-      - master  # 使用 master 分支
+      - master  # 触发主分支的推送事件
   pull_request:
     branches:
-      - master
+      - master  # 触发主分支的 PR 事件
   workflow_dispatch:  # 允许手动触发工作流
 
 jobs:
@@ -17,19 +17,22 @@ jobs:
     - name: Checkout code
       uses: actions/checkout@v3  # 检出当前代码
 
-    - name: Setup .NET SDK
-      uses: actions/setup-dotnet@v3
-      with:
-        dotnet-version: '7.0'  # 设置 .NET SDK 版本（根据实际需求修改）
+    - name: Setup MSBuild
+      run: |
+        # 安装必要的构建工具，如 Visual Studio Build Tools
+        choco install visualstudio2019buildtools --version 16.11.3
 
-    - name: Restore dependencies
-      run: dotnet restore  # 恢复 NuGet 包
+    - name: Restore NuGet packages
+      run: |
+        nuget restore cfnat.win.gui.sln  # 恢复 NuGet 包
 
-    - name: Build project
-      run: dotnet build --configuration Release --arch x64  # 编译时明确指定 x64 架构
+    - name: Build the project
+      run: |
+        msbuild cfnat.win.gui.csproj /p:Configuration=Release /p:Platform=x64  # 使用 MSBuild 编译项目
 
-    - name: Publish project
-      run: dotnet publish --configuration Release --runtime win-x64 --self-contained true --output ./publish  # 发布为 x64 自包含应用
+    - name: Publish the project
+      run: |
+        msbuild cfnat.win.gui.csproj /p:Configuration=Release /p:Platform=x64 /p:DeployOnBuild=true /p:PublishProfile=FolderProfile /p:PublishDir=./publish  # 发布项目
 
     - name: Upload build artifacts
       uses: actions/upload-artifact@v3
