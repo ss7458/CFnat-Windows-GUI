@@ -28,8 +28,6 @@ jobs:
         # 显式将 Visual Studio MSBuild 路径添加到环境变量中
         echo "##[add-path]C:\\Program Files (x86)\\Microsoft Visual Studio\\2019\\BuildTools\\MSBuild\\Current\\Bin" >> $GITHUB_ENV  # 添加 Visual Studio 2019 BuildTools MSBuild 路径
         echo "##[add-path]C:\\Program Files\\Microsoft Visual Studio\\2022\\Enterprise\\MSBuild\\Current\\Bin" >> $GITHUB_ENV  # 添加 Visual Studio 2022 MSBuild 路径
-    - name: Check PATH
-      run: echo $env:PATH
 
     - name: Check MSBuild path
       run: |
@@ -43,7 +41,7 @@ jobs:
     - name: Build the project
       run: |
         # 使用 msbuild 的完整路径来编译项目
-        "C:\\Program Files (x86)\\Microsoft Visual Studio\\2019\\BuildTools\\MSBuild\\Current\\Bin\\msbuild.exe" cfnat.win.gui.csproj /p:Configuration=Release /p:Platform=x64  # 使用完整路径执行 msbuild
+        & "C:\\Program Files\\Microsoft Visual Studio\\2022\\Enterprise\\MSBuild\\Current\\Bin\\msbuild.exe" "cfnat.win.gui.csproj" /p:Configuration=Release /p:Platform=x64
 
     - name: Upload build artifacts
       uses: actions/upload-artifact@v3
