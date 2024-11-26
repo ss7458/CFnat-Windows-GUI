@@ -3,7 +3,7 @@ name: Build and Publish CFnat-Windows-GUI
 on:
   push:
     branches:
-      - master  # 将分支名称更新为 master
+      - master  # 使用 master 分支
   pull_request:
     branches:
       - master
@@ -26,7 +26,7 @@ jobs:
       run: dotnet restore  # 恢复 NuGet 包
 
     - name: Build project
-      run: dotnet build --configuration Release  # 编译项目（不使用 --runtime）
+      run: dotnet build --configuration Release --arch x64  # 编译时明确指定 x64 架构
 
     - name: Publish project
       run: dotnet publish --configuration Release --runtime win-x64 --self-contained true --output ./publish  # 发布为 x64 自包含应用
