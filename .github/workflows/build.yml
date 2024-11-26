@@ -21,14 +21,20 @@ jobs:
         with:
           update: true
 
+      - name: Check MSYS2 environment
+        run: |
+          # 确认 MSYS2 环境和 pacman 是否可用
+          pacman -V
+          pacman -Syy  # 强制同步数据库
+          
       - name: Install dependencies
         run: |
-          # 确保 pacman 可用并安装依赖
+          # 确保 pacman 可以安装依赖
           pacman -S --noconfirm base-devel mingw-w64-x86_64-toolchain mingw-w64-x86_64-qt5
 
       - name: Build project
         run: |
-          # 假设项目使用 CMake 构建
+          # 假设使用 CMake 构建
           cmake -G "MSYS Makefiles" .
           make
 
