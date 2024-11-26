@@ -1,10 +1,9 @@
 name: Build and Publish CFnat-Windows-GUI
 
-# 触发事件：每次推送到 main 分支时或每次手动触发
 on:
   push:
     branches:
-      - master
+      - master  # 将分支名称更新为 master
   pull_request:
     branches:
       - master
@@ -13,7 +12,7 @@ on:
 jobs:
   build:
     runs-on: windows-latest  # 使用 Windows 环境构建
-    
+
     steps:
     - name: Checkout code
       uses: actions/checkout@v3  # 检出当前代码
@@ -27,7 +26,7 @@ jobs:
       run: dotnet restore  # 恢复 NuGet 包
 
     - name: Build project
-      run: dotnet build --configuration Release --runtime win-x64  # 编译项目
+      run: dotnet build --configuration Release  # 编译项目（不使用 --runtime）
 
     - name: Publish project
       run: dotnet publish --configuration Release --runtime win-x64 --self-contained true --output ./publish  # 发布为 x64 自包含应用
@@ -37,17 +36,3 @@ jobs:
       with:
         name: cfnat-windows-gui
         path: ./publish  # 将构建结果上传为构建工件
-
-  # 如果你希望进行进一步的部署，可以增加一个部署步骤
-  deploy:
-    runs-on: windows-latest
-    needs: build  # 部署步骤依赖于构建步骤完成
-
-    steps:
-    - name: Download build artifacts
-      uses: actions/download-artifact@v3
-      with:
-        name: cfnat-windows-gui
-        path: ./publish
-
-    # 在这里可以进行后续的部署步骤，比如将文件上传到服务器或发布到其他位置
