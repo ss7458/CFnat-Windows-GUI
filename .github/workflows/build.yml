@@ -1,5 +1,6 @@
-name: Build CFnat-Windows-GUI
+name: Build and Publish CFnat-Windows-GUI
 
+# 触发事件：每次推送到 main 分支时或每次手动触发
 on:
   push:
     branches:
@@ -7,39 +8,46 @@ on:
   pull_request:
     branches:
       - master
+  workflow_dispatch:  # 允许手动触发工作流
 
 jobs:
   build:
+    runs-on: windows-latest  # 使用 Windows 环境构建
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v3  # 检出当前代码
+
+    - name: Setup .NET SDK
+      uses: actions/setup-dotnet@v3
+      with:
+        dotnet-version: '7.0'  # 设置 .NET SDK 版本（根据实际需求修改）
+
+    - name: Restore dependencies
+      run: dotnet restore  # 恢复 NuGet 包
+
+    - name: Build project
+      run: dotnet build --configuration Release --runtime win-x64  # 编译项目
+
+    - name: Publish project
+      run: dotnet publish --configuration Release --runtime win-x64 --self-contained true --output ./publish  # 发布为 x64 自包含应用
+
+    - name: Upload build artifacts
+      uses: actions/upload-artifact@v3
+      with:
+        name: cfnat-windows-gui
+        path: ./publish  # 将构建结果上传为构建工件
+
+  # 如果你希望进行进一步的部署，可以增加一个部署步骤
+  deploy:
     runs-on: windows-latest
+    needs: build  # 部署步骤依赖于构建步骤完成
 
     steps:
-      - name: Checkout code
-        uses: actions/checkout@v3
+    - name: Download build artifacts
+      uses: actions/download-artifact@v3
+      with:
+        name: cfnat-windows-gui
+        path: ./publish
 
-      - name: Set up MSYS2
-        uses: msys2/setup-msys2@v2
-        with:
-          update: true
-
-      - name: Check MSYS2 environment
-        run: |
-          # 确认 MSYS2 环境和 pacman 是否可用
-          pacman -V
-          pacman -Syy  # 强制同步数据库
-          
-      - name: Install dependencies
-        run: |
-          # 确保 pacman 可以安装依赖
-          pacman -S --noconfirm base-devel mingw-w64-x86_64-toolchain mingw-w64-x86_64-qt5
-
-      - name: Build project
-        run: |
-          # 假设使用 CMake 构建
-          cmake -G "MSYS Makefiles" .
-          make
-
-      - name: Archive build artifacts
-        uses: actions/upload-artifact@v3
-        with:
-          name: cfnat-windows-gui-artifacts
-          path: ./path/to/built/output  # 修改为实际的构建输出路径
+    # 在这里可以进行后续的部署步骤，比如将文件上传到服务器或发布到其他位置
