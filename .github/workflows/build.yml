@@ -15,17 +15,19 @@ jobs:
 
     steps:
     - name: Checkout code
-      uses: actions/checkout@v3  # 检出当前代码
+      uses: actions/checkout@v3  # 获取源代码
 
-    - name: Install Visual Studio Build Tools
+    - name: Install .NET SDK and Visual Studio Build Tools
       run: |
-        # 安装 Visual Studio Build Tools，以确保 MSBuild 工具可用
-        choco install visualstudio2019buildtools --version 16.11.3
+        # 安装 .NET SDK 和 Visual Studio Build Tools
+        choco install dotnet --version 6.0.100  # 安装指定版本的 .NET SDK
+        choco install visualstudio2019buildtools --version 16.11.3  # 安装 Visual Studio 2019 Build Tools
 
     - name: Add MSBuild to PATH
       run: |
-        # 将 MSBuild 添加到环境变量中（如果它没有被自动添加）
-        echo "##[add-path]C:\\Program Files (x86)\\Microsoft Visual Studio\\2019\\BuildTools\\MSBuild\\Current\\Bin" >> $GITHUB_ENV
+        # 将 MSBuild 添加到 PATH 环境变量中
+        echo "##[add-path]C:\\Program Files\\dotnet" >> $GITHUB_ENV  # 确保 .NET SDK 的路径在 PATH 中
+        echo "##[add-path]C:\\Program Files (x86)\\Microsoft Visual Studio\\2019\\BuildTools\\MSBuild\\Current\\Bin" >> $GITHUB_ENV  # 将 MSBuild 路径添加到 PATH 中
 
     - name: Restore NuGet packages
       run: |
@@ -39,4 +41,4 @@ jobs:
       uses: actions/upload-artifact@v3
       with:
         name: cfnat-windows-gui
-        path: ./bin/Release  # 将构建结果上传为构建工件
+        path: ./bin/Release  # 上传构建结果
